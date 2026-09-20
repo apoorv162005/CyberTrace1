@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Analysis | CyberTrace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <p class="eyebrow">CASE {{ case_id }}</p>
+            <h1>Analysis Result</h1>
+        </div>
+        <a class="back" href="{{ url_for('index') }}">← New Analysis</a>
+    </header>
+
+    <section class="risk {{ result.risk|lower }}">
+        <div>
+            <p class="eyebrow">ASSESSMENT</p>
+            <h2>{{ result.risk }} RISK</h2>
+        </div>
+        <p>This is a rule-based indicator, not proof of malicious activity.</p>
+    </section>
+
+    <section class="grid">
+        <div class="panel">
+            <h2>Evidence Metadata</h2>
+            <table>
+                <tr><th>Filename</th><td>{{ result.name }}</td></tr>
+                <tr><th>File size</th><td>{{ result.size }} bytes</td></tr>
+                <tr><th>Extension</th><td>{{ result.extension }}</td></tr>
+                <tr><th>Created</th><td>{{ result.created }}</td></tr>
+                <tr><th>Modified</th><td>{{ result.modified }}</td></tr>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>Cryptographic Hashes</h2>
+            <table>
+                <tr><th>MD5</th><td class="hash">{{ result.md5 }}</td></tr>
+                <tr><th>SHA-256</th><td class="hash">{{ result.sha256 }}</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Risk Indicators</h2>
+        <ul class="indicators">
+            {% for reason in result.risk_reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if result.log_analysis %}
+    <section class="grid">
+        <div class="panel">
+            <h2>Log Summary</h2>
+            <p><strong>Unique IPs:</strong> {{ result.log_analysis.ips|length }}</p>
+            <p><strong>Failed authentication events:</strong> {{ result.log_analysis.failed_count }}</p>
+            <p><strong>Usernames:</strong>
+                {{ result.log_analysis.usernames|join(', ') if result.log_analysis.usernames else 'None found' }}
+            </p>
+        </div>
+
+        <div class="panel">
+            <h2>Detected IP Addresses</h2>
+            {% if result.log_analysis.ips %}
+                <div class="chips">
+                {% for ip in result.log_analysis.ips %}
+                    <span>{{ ip }}</span>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p>No IP addresses found.</p>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <form action="{{ url_for('report') }}" method="post">
+        <input type="hidden" name="case_id" value="{{ case_id }}">
+        <input type="hidden" name="name" value="{{ result.name }}">
+        <input type="hidden" name="size" value="{{ result.size }}">
+        <input type="hidden" name="extension" value="{{ result.extension }}">
+        <input type="hidden" name="created" value="{{ result.created }}">
+        <input type="hidden" name="modified" value="{{ result.modified }}">
+        <input type="hidden" name="md5" value="{{ result.md5 }}">
+        <input type="hidden" name="sha256" value="{{ result.sha256 }}">
+        <input type="hidden" name="risk" value="{{ result.risk }}">
+        {% for reason in result.risk_reasons %}
+        <input type="hidden" name="risk_reason" value="{{ reason }}">
+        {% endfor %}
+        <button type="submit">Generate PDF Report ↓</button>
+    </form>
+
+    <footer>CyberTrace MVP • Use only on authorized evidence.</footer>
+</div>
+</body>
+</html>
