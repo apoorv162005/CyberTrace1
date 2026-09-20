@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CyberTrace | Digital Forensics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <p class="eyebrow">DIGITAL FORENSICS PLATFORM</p>
+            <h1>CyberTrace</h1>
+            <p class="subtitle">Evidence analysis, cryptographic hashing and log investigation.</p>
+        </div>
+        <div class="badge">AUTHORIZED USE ONLY</div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert">
+          {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="hero">
+        <h2>Start a forensic analysis</h2>
+        <p>Upload a sample or authorized evidence file. CyberTrace will calculate hashes, extract metadata and inspect supported text/log files for predefined indicators.</p>
+
+        <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+            <label class="upload">
+                <input type="file" name="evidence" required>
+                <span>Choose evidence file</span>
+            </label>
+            <button type="submit">Analyze Evidence →</button>
+        </form>
+        <small>Maximum file size: 25 MB. Use only data you are authorized to examine.</small>
+    </section>
+
+    <section class="cards">
+        <div class="card"><span>01</span><h3>Metadata</h3><p>Filename, size, type, creation and modification timestamps.</p></div>
+        <div class="card"><span>02</span><h3>Hashes</h3><p>MD5 and SHA-256 values for evidence integrity verification.</p></div>
+        <div class="card"><span>03</span><h3>Log Analysis</h3><p>Extract IPs, usernames, timestamps and failed-login patterns.</p></div>
+        <div class="card"><span>04</span><h3>Report</h3><p>Generate a clean PDF investigation report for your case.</p></div>
+    </section>
+
+    <footer>CyberTrace MVP • Built for authorized forensic investigation and demonstration.</footer>
+</div>
+</body>
+</html>
